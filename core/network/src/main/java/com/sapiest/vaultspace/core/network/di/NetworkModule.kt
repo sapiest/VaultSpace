@@ -3,9 +3,6 @@ package com.sapiest.vaultspace.core.network.di
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.sapiest.vaultspace.core.network.ApiClient
 import com.sapiest.vaultspace.core.network.ApiClientImpl
-import com.sapiest.vaultspace.core.network.ServiceProvider
-import com.sapiest.vaultspace.core.network.getServiceProvider
-import com.sapiest.vaultspace.core.network.now.NowService
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -53,15 +50,6 @@ object NetworkModule {
         )
         .callFactory(okhttpCallFactory)
         .build()
-
-
-    @Singleton
-    @Provides
-    fun provideNowService(
-        retrofit: Retrofit
-    ): ServiceProvider<NowService> = getServiceProvider {
-        retrofit.create(NowService::class.java)
-    }
 }
 
 @Module

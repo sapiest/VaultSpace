@@ -2,6 +2,7 @@ package com.sapiest.vaultspace.feature.currencyrates.data.local
 
 import com.sapiest.vaultspace.core.database.providers.DaoProvider
 import com.sapiest.vaultspace.feature.currencyrates.common.CurrencyCode
+import com.sapiest.vaultspace.feature.currencyrates.common.models.CurrencyModel
 import com.sapiest.vaultspace.feature.currencyrates.data.local.database.dao.CurrencyDataDao
 import com.sapiest.vaultspace.feature.currencyrates.data.local.database.dao.CurrencyRatesDao
 import com.sapiest.vaultspace.feature.currencyrates.data.local.database.dao.CurrencyResourceDao
@@ -10,6 +11,8 @@ import com.sapiest.vaultspace.feature.currencyrates.data.local.database.models.C
 import com.sapiest.vaultspace.feature.currencyrates.data.local.database.models.CurrencyRateEntity
 import com.sapiest.vaultspace.feature.currencyrates.data.local.database.models.CurrencyResource
 import com.sapiest.vaultspace.feature.currencyrates.data.local.database.models.CurrencyTimeStampEntity
+import com.sapiest.vaultspace.feature.currencyrates.data.local.database.models.toCurrencyModel
+import com.sapiest.vaultspace.feature.currencyrates.data.local.database.models.toListCurrencyModel
 import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
@@ -19,13 +22,6 @@ class CurrencyRatesLocalDataSource @Inject constructor(
     private val currencyResourceDao: DaoProvider<CurrencyResourceDao>,
     private val currencyTimeStampDao: DaoProvider<CurrencyTimeStampDao>
 ) {
-
-    suspend fun getCurrencyResource(@CurrencyCode name: String): CurrencyResource? =
-        currencyResourceDao().getCurrencyResource(name)
-
-    suspend fun getAllCurrencyResources(): List<CurrencyResource>? =
-        currencyResourceDao().getAllCurrencyResource()
-
     suspend fun insertCurrencyData(currencyDataEntity: CurrencyDataEntity) =
         currencyDataDao().insertCurrencyData(currencyDataEntity)
 
@@ -41,5 +37,22 @@ class CurrencyRatesLocalDataSource @Inject constructor(
 
     suspend fun updateLastUpdateTimestamp(timestamp: LocalDateTime) {
         currencyTimeStampDao().insertOrUpdateLastUpdate(CurrencyTimeStampEntity(lastUpdate = timestamp))
+    }
+
+    suspend fun fetchCurrencyFromCache(@CurrencyCode name: String): Result<CurrencyModel> {
+        return kotlin.runCatching {
+            val currencyResource = currencyResourceDao().getCurrencyResource(name)
+            requireNotNull(currencyResource) { "CurrencyResource with $name not found" }
+            currencyResource.toCurrencyModel()
+        }
+    }
+
+    suspend fun fetchCurrenciesFromCache(): Result<List<CurrencyModel>> {
+        return kotlin.runCatching {
+            val currencyResourceList =
+                currencyResourceDao().getAllCurrencyResource()
+            requireNotNull(currencyResourceList) { "CurrencyResourceList is empty" }
+            currencyResourceList.toListCurrencyModel()
+        }
     }
 }

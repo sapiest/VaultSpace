@@ -9,7 +9,7 @@ import com.sapiest.vaultspace.feature.currencyrates.data.local.database.dao.Curr
 import com.sapiest.vaultspace.feature.currencyrates.data.local.database.dao.CurrencyResourceDao
 import com.sapiest.vaultspace.feature.currencyrates.data.local.database.dao.CurrencyTimeStampDao
 import com.sapiest.vaultspace.feature.currencyrates.data.remote.CurrencyRatesService
-import dagger.Binds
+import com.sapiest.vaultspace.feature.currencyrates.data.remote.NowService
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -29,6 +29,15 @@ object CurrencyRatesModule {
     ): ServiceProvider<CurrencyRatesService> =
         getServiceProvider {
             retrofit.create(CurrencyRatesService::class.java)
+        }
+
+    @Provides
+    @Singleton
+    fun provideNowService(
+        retrofit: Retrofit
+    ): ServiceProvider<NowService> =
+        getServiceProvider {
+            retrofit.create(NowService::class.java)
         }
 
     @Provides
