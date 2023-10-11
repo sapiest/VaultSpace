@@ -22,6 +22,10 @@ interface CurrencyRateRepository {
         names: List<@CurrencyCode String>,
         forceUpdate: Boolean = false
     ): Result<List<CurrencyModel>>
+
+    suspend fun getAllCurrencies(
+        forceUpdate: Boolean = false
+    ): Result<List<CurrencyModel>>
 }
 
 class CurrencyRateRepositoryImpl @Inject constructor(
@@ -34,42 +38,50 @@ class CurrencyRateRepositoryImpl @Inject constructor(
         get() = nowProvider()
 
     private suspend fun shouldFetchFromServer(forceUpdate: Boolean): Boolean {
+        if (forceUpdate) return true
         val lastUpdate = currencyRatesLocalDataSource.getLastUpdateTimestamp()
-        return forceUpdate || lastUpdate.plusDays(1).isAfter(now)
+        return lastUpdate.plusDays(1).isAfter(now)
     }
 
     override suspend fun getCurrency(
         @CurrencyCode name: String,
         forceUpdate: Boolean
     ): Result<CurrencyModel> {
-        return fetchData(forceUpdate) { it.name == name }?.firstOrNull()
-            ?.run { Result.success(this) }
-            ?: return Result.failure(Exception("Currency $name not found"))
+        return fetchData(forceUpdate) { it.name == name }
+            .mapCatching {
+                it.firstOrNull() ?: throw NoSuchElementException("Currency $name not found")
+            }
     }
 
     override suspend fun getMyCurrencies(
         names: List<@CurrencyCode String>,
         forceUpdate: Boolean
     ): Result<List<CurrencyModel>> {
-        return fetchData(forceUpdate) { it.name in names }?.run { Result.success(this) }
-            ?: return Result.failure(Exception("Currencies $names not found"))
+        return fetchData(forceUpdate) { it.name in names }
+            .onFailure {
+                return Result.failure(Exception("Currencies $names not found or ${it.message}"))
+            }
     }
 
+    override suspend fun getAllCurrencies(forceUpdate: Boolean): Result<List<CurrencyModel>> {
+        return fetchData(forceUpdate)
+            .onFailure {
+                return Result.failure(Exception("Currencies not found"))
+            }
+    }
 
     private suspend fun fetchData(
         forceUpdate: Boolean,
-        predicate: (CurrencyModel) -> Boolean
-    ): List<CurrencyModel>? {
-        if (shouldFetchFromServer(forceUpdate)) {
+        predicate: (CurrencyModel) -> Boolean = { true }
+    ): Result<List<CurrencyModel>> {
+        return if (shouldFetchFromServer(forceUpdate)) {
             val currencyModelResult =
                 saveCurrencyToCache { currencyRatesRemoteDataSource.getCurrenciesFromServer() }
-            if (currencyModelResult.isSuccess) {
-                return currencyModelResult.getOrNull()?.filter(predicate)
-            }
-            return null
+            currencyModelResult.map { it.filter(predicate) }
         } else {
-            return currencyRatesLocalDataSource.fetchCurrenciesFromCache().getOrNull()
-                ?.filter(predicate)
+            currencyRatesLocalDataSource.fetchCurrenciesFromCache().map {
+                it.filter(predicate)
+            }
         }
     }
 

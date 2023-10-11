@@ -10,10 +10,11 @@ android {
 }
 
 dependencies {
+    api (project(":features:currencyrates:common"))
+
     implementation(project(":core:network"))
     implementation(project(":core:database"))
     implementation(project(":core:coroutines"))
-    implementation(project(":features:currencyrates:common"))
 
     implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlinx.serialization.json)
