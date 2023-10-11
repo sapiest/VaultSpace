@@ -16,6 +16,7 @@ import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -24,8 +25,23 @@ object CurrencyRatesModule {
 
     @Provides
     @Singleton
-    fun provideCurrencyRatesService(
+    @Named("nowApi")
+    fun provideNowApiRetrofit(
         retrofit: Retrofit
+    ): Retrofit = retrofit.newBuilder().baseUrl("https://timeapi.io/api").build()
+
+
+    @Provides
+    @Singleton
+    @Named("currencyApi")
+    fun provideCurrencyApiRetrofit(
+        retrofit: Retrofit
+    ): Retrofit = retrofit.newBuilder().baseUrl("https://api.polygon.io").build()
+
+    @Provides
+    @Singleton
+    fun provideCurrencyRatesService(
+        @Named("currencyApi") retrofit: Retrofit
     ): ServiceProvider<CurrencyRatesService> =
         getServiceProvider {
             retrofit.create(CurrencyRatesService::class.java)
@@ -34,7 +50,7 @@ object CurrencyRatesModule {
     @Provides
     @Singleton
     fun provideNowService(
-        retrofit: Retrofit
+        @Named("nowApi") retrofit: Retrofit
     ): ServiceProvider<NowService> =
         getServiceProvider {
             retrofit.create(NowService::class.java)
