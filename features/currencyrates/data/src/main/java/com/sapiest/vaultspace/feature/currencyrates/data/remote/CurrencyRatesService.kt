@@ -9,8 +9,6 @@ import retrofit2.http.Path
 
 interface CurrencyRatesService {
 
-    // apiKey=k5ZQJloco_VkuADGP1LGykF56ruO5c3s
-    // baseurl = /api.polygon.io
     @GET("/v2/aggs/grouped/locale/global/market/fx/{date}")
     suspend fun getCurrentRates(
         // format YYYY-MM-DD. Api return value only for previous date
