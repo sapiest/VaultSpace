@@ -152,7 +152,7 @@ android {
  */
 dependencies {
     implementation(project(":core:database"))
-    implementation(project(":features:currencyrates:data"))
+    implementation(project(":features:currencyrates:data-impl"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.appcompat)
