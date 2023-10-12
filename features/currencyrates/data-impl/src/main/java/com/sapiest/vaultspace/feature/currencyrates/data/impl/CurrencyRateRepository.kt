@@ -2,6 +2,7 @@ package com.sapiest.vaultspace.feature.currencyrates.data.impl
 
 import com.sapiest.vaultspace.feature.currencyrates.common.CurrencyCode
 import com.sapiest.vaultspace.feature.currencyrates.data.api.CurrencyRateRepository
+import com.sapiest.vaultspace.feature.currencyrates.data.api.models.CurrencyModel
 import com.sapiest.vaultspace.feature.currencyrates.data.impl.local.CurrencyRatesLocalDataSource
 import com.sapiest.vaultspace.feature.currencyrates.data.impl.local.database.models.toListCurrencyModel
 import com.sapiest.vaultspace.feature.currencyrates.data.impl.remote.CurrencyRatesRemoteDataSource
@@ -29,7 +30,7 @@ class CurrencyRateRepositoryImpl @Inject constructor(
     override suspend fun getCurrency(
         @CurrencyCode name: String,
         forceUpdate: Boolean
-    ): Result<com.sapiest.vaultspace.feature.currencyrates.data.api.models.CurrencyModel> {
+    ): Result<CurrencyModel> {
         return fetchData(forceUpdate) { it.name == name }
             .mapCatching {
                 it.firstOrNull() ?: throw NoSuchElementException("Currency $name not found")
@@ -39,14 +40,14 @@ class CurrencyRateRepositoryImpl @Inject constructor(
     override suspend fun getMyCurrencies(
         names: List<@CurrencyCode String>,
         forceUpdate: Boolean
-    ): Result<List<com.sapiest.vaultspace.feature.currencyrates.data.api.models.CurrencyModel>> {
+    ): Result<List<CurrencyModel>> {
         return fetchData(forceUpdate) { it.name in names }
             .onFailure {
                 return Result.failure(Exception("Currencies $names not found or ${it.message}"))
             }
     }
 
-    override suspend fun getAllCurrencies(forceUpdate: Boolean): Result<List<com.sapiest.vaultspace.feature.currencyrates.data.api.models.CurrencyModel>> {
+    override suspend fun getAllCurrencies(forceUpdate: Boolean): Result<List<CurrencyModel>> {
         return fetchData(forceUpdate)
             .onFailure {
                 return Result.failure(Exception("Currencies not found"))
@@ -55,8 +56,8 @@ class CurrencyRateRepositoryImpl @Inject constructor(
 
     private suspend fun fetchData(
         forceUpdate: Boolean,
-        predicate: (com.sapiest.vaultspace.feature.currencyrates.data.api.models.CurrencyModel) -> Boolean = { true }
-    ): Result<List<com.sapiest.vaultspace.feature.currencyrates.data.api.models.CurrencyModel>> {
+        predicate: (CurrencyModel) -> Boolean = { true }
+    ): Result<List<CurrencyModel>> {
         return if (shouldFetchFromServer(forceUpdate)) {
             val currencyModelResult =
                 saveCurrencyToCache { currencyRatesRemoteDataSource.getCurrenciesFromServer() }
@@ -68,12 +69,15 @@ class CurrencyRateRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun saveCurrencyToCache(serverRequest: suspend () -> Result<List<CurrencyDataResponse>>): Result<List<com.sapiest.vaultspace.feature.currencyrates.data.api.models.CurrencyModel>> {
+    private suspend fun saveCurrencyToCache(serverRequest: suspend () -> Result<List<CurrencyDataResponse>>): Result<List<CurrencyModel>> {
         return try {
             val currencyModelResult = serverRequest.invoke()
-            val currencyData = currencyModelResult.getOrNull()?.toCurrencyList() ?: emptyList()
-            currencyRatesLocalDataSource.insertAllCurrencyResources(currencyData)
-            Result.success(currencyData.toListCurrencyModel())
+            val currencyData = currencyModelResult.getOrNull()?.toCurrencyList()
+            if (!currencyData.isNullOrEmpty()) {
+                currencyRatesLocalDataSource.insertAllCurrencyResources(currencyData)
+                currencyRatesLocalDataSource.updateLastUpdateTimestamp(now)
+            }
+            currencyRatesLocalDataSource.fetchCurrenciesFromCache()
         } catch (e: Exception) {
             Result.failure(e)
         }
