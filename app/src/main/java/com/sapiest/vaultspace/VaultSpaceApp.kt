@@ -2,11 +2,9 @@ package com.sapiest.vaultspace
 
 import android.app.Application
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.sapiest.vaultspace.feature.currencyrates.data.remote.NowProvider
+import com.sapiest.vaultspace.feature.currencyrates.data.impl.remote.NowProvider
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
