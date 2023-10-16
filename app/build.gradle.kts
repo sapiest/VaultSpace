@@ -153,6 +153,9 @@ android {
 dependencies {
     implementation(project(":core:database"))
     implementation(project(":features:currencyrates:data-impl"))
+    implementation(project(":sync"))
+
+    implementation(libs.hilt.work)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.appcompat)

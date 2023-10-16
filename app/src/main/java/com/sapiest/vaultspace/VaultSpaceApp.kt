@@ -3,6 +3,7 @@ package com.sapiest.vaultspace
 import android.app.Application
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.sapiest.vaultspace.feature.currencyrates.data.impl.remote.NowProvider
+import com.sapiest.vaultspace.sync.workers.init.SyncInitializer
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -25,10 +26,10 @@ class VaultSpaceApp: Application() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate() {
         AndroidThreeTen.init(this)
-
         super.onCreate()
 
         GlobalScope.launch(Dispatchers.Default + coroutineExceptionHandler){
+            SyncInitializer.initialize(this@VaultSpaceApp)
             nowProvider.initialize()
         }
     }
