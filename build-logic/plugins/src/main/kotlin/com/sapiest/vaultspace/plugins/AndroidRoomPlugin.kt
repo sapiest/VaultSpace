@@ -1,5 +1,7 @@
 package com.sapiest.vaultspace.plugins
 
+import com.sapiest.vaultspace.plugins.extensions.ksp
+import com.sapiest.vaultspace.plugins.extensions.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.InputDirectory

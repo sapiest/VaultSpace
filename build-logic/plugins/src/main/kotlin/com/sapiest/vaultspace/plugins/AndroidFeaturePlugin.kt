@@ -1,5 +1,6 @@
 package com.sapiest.vaultspace.plugins
 
+import com.sapiest.vaultspace.plugins.extensions.androidLibrary
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
