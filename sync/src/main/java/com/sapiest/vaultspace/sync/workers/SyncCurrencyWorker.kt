@@ -3,12 +3,14 @@ package com.sapiest.vaultspace.sync.workers
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.sapiest.vaultspace.feature.currencyrates.data.api.CurrencyRateRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.util.concurrent.TimeUnit
 
 @HiltWorker
 class SyncCurrencyWorker @AssistedInject constructor(
@@ -30,10 +32,10 @@ class SyncCurrencyWorker @AssistedInject constructor(
         /**
          * Expedited one time work to sync data on app startup
          */
-        fun startUpSyncWork(workManager: WorkManager) = workManager.enqueueUniqueWork(
+        fun startUpSyncWork(workManager: WorkManager) = workManager.enqueueUniquePeriodicWork(
             workerName,
-            ExistingWorkPolicy.KEEP,
-            DelegatingWorker.delegateWork<SyncCurrencyWorker>()
+            ExistingPeriodicWorkPolicy.KEEP,
+            DelegatingWorker.delegatePeriodicWork<SyncCurrencyWorker>(24, TimeUnit.HOURS)
         )
 
         // This name should not be changed otherwise the app may have concurrent sync requests running

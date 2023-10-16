@@ -7,12 +7,15 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.sapiest.vaultspace.sync.workers.init.SyncConstraints
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
 /**
@@ -65,7 +68,17 @@ class DelegatingWorker(
     override suspend fun doWork(): Result = delegateWorker.doWork()
 
     companion object {
-        internal inline fun <reified T : CoroutineWorker> delegateWork() =
+
+        internal inline fun <reified T : CoroutineWorker> delegatePeriodicWork(
+            repeatInterval: Long,
+            repeatIntervalTimeUnit: TimeUnit
+        ) = PeriodicWorkRequestBuilder<DelegatingWorker>(repeatInterval, repeatIntervalTimeUnit)
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .setConstraints(SyncConstraints)
+            .setInputData(T::class.delegatedData())
+            .build()
+
+        internal inline fun <reified T : CoroutineWorker> delegateOneTimeWork() =
             OneTimeWorkRequestBuilder<DelegatingWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .setConstraints(SyncConstraints)
