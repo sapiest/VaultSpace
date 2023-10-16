@@ -1,4 +1,4 @@
-package com.sapiest.vaultspace.plugins
+package com.sapiest.vaultspace.plugins.extensions
 
 import com.android.build.api.dsl.LibraryExtension
 import com.google.devtools.ksp.gradle.KspExtension
@@ -34,3 +34,6 @@ internal fun Project.ksp(configure: Action<KspExtension>) {
 internal fun LibraryExtension.kotlinOptions(configure: Action<KotlinJvmOptions>) {
     (this as ExtensionAware).extensions.configure("kotlinOptions", configure)
 }
+
+internal fun Project.localProperties(): LocalPropertyExtension =
+    extensions.create("localProps", LocalPropertyExtension::class.java, this)

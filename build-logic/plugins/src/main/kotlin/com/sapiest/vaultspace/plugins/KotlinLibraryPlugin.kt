@@ -1,6 +1,7 @@
 package com.sapiest.vaultspace.plugins
 
 import com.sapiest.vaultspace.plugins.ProjectConstants.javaCompileTargetVersion
+import com.sapiest.vaultspace.plugins.extensions.java
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project

@@ -15,6 +15,9 @@ import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Call
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -35,8 +38,19 @@ object CurrencyRatesModule {
     @Singleton
     @Named("currencyApi")
     fun provideCurrencyApiRetrofit(
-        retrofit: Retrofit
-    ): Retrofit = retrofit.newBuilder().baseUrl("https://api.polygon.io").build()
+        retrofit: Retrofit,
+        @Named("currencyApi") apiKeyInterceptor: Interceptor
+    ): Retrofit  {
+        val existingCallFactory = retrofit.callFactory() as OkHttpClient
+        existingCallFactory.newBuilder()
+            .addInterceptor(apiKeyInterceptor)
+            .build()
+
+        return retrofit.newBuilder()
+            .baseUrl("https://api.polygon.io")
+            .callFactory(existingCallFactory)
+            .build()
+    }
 
     @Provides
     @Singleton

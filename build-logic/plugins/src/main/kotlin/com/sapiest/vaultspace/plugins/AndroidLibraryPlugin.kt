@@ -4,14 +4,18 @@ import com.sapiest.vaultspace.plugins.ProjectConstants.javaCompileTargetVersion
 import com.sapiest.vaultspace.plugins.ProjectConstants.javaVersion
 import com.sapiest.vaultspace.plugins.ProjectConstants.compileSdkVersion
 import com.sapiest.vaultspace.plugins.ProjectConstants.minSdkVersion
+import com.sapiest.vaultspace.plugins.extensions.androidLibrary
+import com.sapiest.vaultspace.plugins.extensions.kotlin
+import com.sapiest.vaultspace.plugins.extensions.kotlinOptions
+import com.sapiest.vaultspace.plugins.extensions.localProperties
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.kotlin
 import org.gradle.kotlin.dsl.provideDelegate
+import java.util.Properties
 
 class AndroidLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
@@ -21,8 +25,6 @@ class AndroidLibraryPlugin : Plugin<Project> {
     }
 
     private fun Project.configureAndroid() {
-
-
         kotlin {
             jvmToolchain {
                 languageVersion.set(JavaLanguageVersion.of(javaVersion))
@@ -43,6 +45,10 @@ class AndroidLibraryPlugin : Plugin<Project> {
                     sourceCompatibility = JavaVersion.toVersion(javaCompileTargetVersion)
                     targetCompatibility = JavaVersion.toVersion(javaCompileTargetVersion)
                 }
+
+                buildConfigField(
+                    "String", CURRENCY_API_KEY, localProperties().getProperty(CURRENCY_API_KEY)
+                )
             }
 
             buildTypes {
@@ -79,5 +85,9 @@ class AndroidLibraryPlugin : Plugin<Project> {
         apply("com.android.library")
         apply("org.jetbrains.kotlin.android")
         apply("com.sapiest.vaultspace.android.hilt")
+    }
+
+    private companion object {
+        const val CURRENCY_API_KEY = "CURRENCY_API_KEY"
     }
 }
