@@ -3,6 +3,7 @@ plugins {
     id(libs.plugins.vaultspace.android.library.get().pluginId)
     id(libs.plugins.vaultspace.hilt.get().pluginId)
 }
+
 android {
     namespace = "com.sapiest.vaultspace.feature.curencyrates.domain.usecase.impl"
 }

@@ -47,7 +47,14 @@ class AndroidLibraryPlugin : Plugin<Project> {
                 }
 
                 buildConfigField(
-                    "String", CURRENCY_API_KEY, localProperties().getProperty(CURRENCY_API_KEY)
+                    "String",
+                    CURRENCY_API_KEY,
+                    localProperties().getProperty(CURRENCY_API_KEY)
+                )
+                buildConfigField(
+                    "String",
+                    OAUTH_CLIENT_ID,
+                    localProperties().getProperty(OAUTH_CLIENT_ID)
                 )
             }
 
@@ -89,5 +96,6 @@ class AndroidLibraryPlugin : Plugin<Project> {
 
     private companion object {
         const val CURRENCY_API_KEY = "CURRENCY_API_KEY"
+        const val OAUTH_CLIENT_ID = "OAUTH_CLIENT_ID"
     }
 }

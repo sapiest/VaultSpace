@@ -4,7 +4,6 @@ import com.sapiest.vaultspace.feature.currencyrates.common.CurrencyCode
 import com.sapiest.vaultspace.feature.currencyrates.data.api.CurrencyRateRepository
 import com.sapiest.vaultspace.feature.currencyrates.data.api.models.CurrencyModel
 import com.sapiest.vaultspace.feature.currencyrates.data.impl.local.CurrencyRatesLocalDataSource
-import com.sapiest.vaultspace.feature.currencyrates.data.impl.local.database.models.toListCurrencyModel
 import com.sapiest.vaultspace.feature.currencyrates.data.impl.remote.CurrencyRatesRemoteDataSource
 import com.sapiest.vaultspace.feature.currencyrates.data.impl.remote.NowProvider
 import com.sapiest.vaultspace.feature.currencyrates.data.impl.remote.models.CurrencyDataResponse
