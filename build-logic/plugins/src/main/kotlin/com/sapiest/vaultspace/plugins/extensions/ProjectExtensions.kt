@@ -8,6 +8,7 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
@@ -36,4 +37,12 @@ internal fun LibraryExtension.kotlinOptions(configure: Action<KotlinJvmOptions>)
 }
 
 internal fun Project.localProperties(): LocalPropertyExtension =
-    extensions.create("localProps", LocalPropertyExtension::class.java, this)
+    if (extensions.findByName("localProps") == null) {
+        extensions.create(
+            "localProps",
+            LocalPropertyExtension::class.java,
+            this
+        )
+    } else {
+        extensions.get("localProps") as LocalPropertyExtension
+    }

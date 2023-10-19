@@ -11,7 +11,7 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.process.CommandLineArgumentProvider
 import java.io.File
 
-class AndroidRoomPlugin: Plugin<Project> {
+class AndroidRoomPlugin : Plugin<Project> {
 
     override fun apply(target: Project): Unit = with(target) {
         applyPlugins()
@@ -23,7 +23,7 @@ class AndroidRoomPlugin: Plugin<Project> {
         apply("com.google.devtools.ksp")
     }
 
-    private fun Project.applyDependencies(){
+    private fun Project.applyDependencies() {
         dependencies {
             add("implementation", libs.findLibrary("room.runtime").get())
             add("implementation", libs.findLibrary("room.ktx").get())
@@ -36,7 +36,10 @@ class AndroidRoomPlugin: Plugin<Project> {
             // The schemas directory contains a schema file for each version of the Room database.
             // This is required to enable Room auto migrations.
             // See https://developer.android.com/reference/kotlin/androidx/room/AutoMigration.
-            arg(RoomSchemaArgProvider(File(projectDir, "schemas")))
+            val file = File(projectDir, "schemas")
+            if (file.exists()) {
+                arg(RoomSchemaArgProvider(file))
+            }
         }
     }
 

@@ -16,9 +16,7 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:coroutines"))
 
-    implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlinx.serialization.json)
-
     implementation(libs.androidx.core.ktx)
 
     testImplementation(libs.junit)

@@ -9,6 +9,8 @@ plugins {
 
     id(libs.plugins.vaultspace.hilt.get().pluginId)
     id(libs.plugins.vaultspace.room.get().pluginId)
+
+    alias(libs.plugins.firebase)
 }
 
 /**
@@ -154,6 +156,7 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":features:currencyrates:data-impl"))
     implementation(project(":sync"))
+    implementation(project(":app-bind"))
 
     implementation(libs.hilt.work)
 

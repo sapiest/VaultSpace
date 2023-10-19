@@ -33,7 +33,6 @@ object CurrencyRatesModule {
         retrofit: Retrofit
     ): Retrofit = retrofit.newBuilder().baseUrl("https://timeapi.io/api").build()
 
-
     @Provides
     @Singleton
     @Named("currencyApi")

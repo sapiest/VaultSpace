@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.sapiest.vaultspace.core.coroutines"
 }
+
+dependencies {
+    api(libs.kotlinx.coroutines)
+}
